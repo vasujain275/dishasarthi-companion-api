@@ -10,6 +10,7 @@ engine = create_async_engine(
     # Add proper pool settings for async
     pool_pre_ping=True,
     pool_recycle=3600,
+    connect_args={"server_settings": {"timezone": "UTC"}},
 )
 
 # Create async session factory with proper configuration

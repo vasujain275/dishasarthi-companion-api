@@ -15,7 +15,6 @@ class Settings(BaseSettings):
     POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", "5432")
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "fastapi")
 
-    # Quote password to handle special characters
     @property
     def DATABASE_URL(self) -> str:
         """Generate database URL with proper escaping for special characters."""
