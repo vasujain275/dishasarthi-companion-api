@@ -1,6 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
-from .location import LocationResponse
 
 
 class PlaceBase(BaseModel):
@@ -19,7 +18,9 @@ class PlaceUpdate(BaseModel):
 
 class PlaceResponse(PlaceBase):
     id: int
-    locations: List[LocationResponse] = []
+    locations: List["LocationResponse"] = []
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
+
+
+from app.schemas.location import LocationResponse

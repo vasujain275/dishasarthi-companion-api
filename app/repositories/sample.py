@@ -1,4 +1,5 @@
 from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from app.models.sample import Sample
 from app.models.rssi_value import RSSIValue
@@ -6,16 +7,17 @@ from app.schemas.sample import SampleCreate, SampleUpdate
 
 
 class SampleRepository:
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     async def create_sample(self, sample_data: SampleCreate) -> Sample:
         # Create Sample with timestamp
         new_sample = Sample(
             location_id=sample_data.location_id,
-            timestamp=sample_data.timestamp,  # Add timestamp
+            timestamp=sample_data.timestamp,
         )
         self.session.add(new_sample)
+        # Need to await flush to get the ID
         await self.session.flush()
 
         # Create RSSI values
@@ -25,8 +27,7 @@ class SampleRepository:
         ]
         self.session.add_all(rssi_values)
 
-        await self.session.commit()
-        await self.session.refresh(new_sample)
+        # No commit here - we'll commit in the route after all operations
         return new_sample
 
     async def get_samples(self, location_id: int) -> list[Sample]:
@@ -58,7 +59,6 @@ class SampleRepository:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Sample not found"
             )
-        await self.session.commit()
         return sample
 
     async def delete_sample(self, sample_id: int) -> None:
@@ -69,4 +69,3 @@ class SampleRepository:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Sample not found"
             )
-        await self.session.commit()

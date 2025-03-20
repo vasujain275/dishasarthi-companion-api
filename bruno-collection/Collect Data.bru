@@ -1,0 +1,49 @@
+meta {
+  name: Collect Data
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base}}/collect
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "user123",
+    "location": "Room 202",
+    "place": "NCU University",
+    "samples": [
+      {
+        "timestamp": "2025-03-19T12:34:56.789Z",
+        "rssi_values": {
+          "00:11:22:33:44:55": -65,
+          "AA:BB:CC:DD:EE:FF": -72
+        }
+      },
+      {
+        "timestamp": "2025-03-19T12:35:00.123Z",
+        "rssi_values": {
+          "00:11:22:33:44:55": -67,
+          "AA:BB:CC:DD:EE:FF": -70
+        }
+      },
+      {
+        "timestamp": "2025-03-19T12:35:05.456Z",
+        "rssi_values": {
+          "00:11:22:33:44:55": -63,
+          "AA:BB:CC:DD:EE:FF": -75
+        }
+      },
+      {
+        "timestamp": "2025-03-19T12:35:10.789Z",
+        "rssi_values": {
+          "00:11:22:33:44:55": -68,
+          "AA:BB:CC:DD:EE:FF": -71
+        }
+      }
+    ]
+  }
+}

@@ -1,6 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
-from .sample import SampleResponse
 
 
 class LocationBase(BaseModel):
@@ -19,7 +18,9 @@ class LocationUpdate(BaseModel):
 
 class LocationResponse(LocationBase):
     id: int
-    samples: List[SampleResponse] = []
+    samples: List["SampleResponse"] = []
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
+
+
+from app.schemas.sample import SampleResponse
