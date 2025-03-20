@@ -27,7 +27,6 @@ class SampleRepository:
         ]
         self.session.add_all(rssi_values)
 
-        # No commit here - we'll commit in the route after all operations
         return new_sample
 
     async def get_samples(self, location_id: int) -> list[Sample]:

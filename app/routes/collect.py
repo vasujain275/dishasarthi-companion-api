@@ -29,23 +29,34 @@ async def collect_data(data: CollectData, db: AsyncSession = Depends(get_db)):
             user_repo = UserRepository(db)
             user = await user_repo.get_user_by_username(data.username)
             if not user:
-                user = await user_repo.create_user(UserCreate(username=data.username))
+                # Don't commit inside here - let the outer transaction handle it
+                user_create = UserCreate(username=data.username)
+                new_user = User(**user_create.model_dump())
+                db.add(new_user)
+                await db.flush()
+                user = new_user
 
             # Get or create place
             place_repo = PlaceRepository(db)
             place = await place_repo.get_place_by_name(user.id, data.place)
             if not place:
-                place = await place_repo.create_place(
-                    PlaceCreate(name=data.place, user_id=user.id)
-                )
+                # Don't commit inside here - let the outer transaction handle it
+                place_create = PlaceCreate(name=data.place, user_id=user.id)
+                new_place = Place(**place_create.model_dump())
+                db.add(new_place)
+                await db.flush()
+                place = new_place
 
             # Get or create location
             location_repo = LocationRepository(db)
             location = await location_repo.get_location_by_name(place.id, data.location)
             if not location:
-                location = await location_repo.create_location(
-                    LocationCreate(name=data.location, place_id=place.id)
-                )
+                # Don't commit inside here - let the outer transaction handle it
+                location_create = LocationCreate(name=data.location, place_id=place.id)
+                new_location = Location(**location_create.model_dump())
+                db.add(new_location)
+                await db.flush()
+                location = new_location
 
             # Create samples with RSSI values
             sample_repo = SampleRepository(db)
@@ -59,7 +70,8 @@ async def collect_data(data: CollectData, db: AsyncSession = Depends(get_db)):
                 ]
 
                 # Create sample with timestamp
-                await sample_repo.create_sample(
+                # Note: The SampleRepository now shouldn't commit either
+                new_sample = await sample_repo.create_sample(
                     SampleCreate(
                         location_id=location.id,
                         timestamp=sample.timestamp,
@@ -68,7 +80,7 @@ async def collect_data(data: CollectData, db: AsyncSession = Depends(get_db)):
                 )
                 samples_created += 1
 
-        # Transaction completed successfully
+        # Transaction completed successfully - the async with block handles the commit
         return {
             "message": "Data collected successfully",
             "details": {
