@@ -11,6 +11,9 @@ from app.repositories.user import UserRepository
 from app.repositories.place import PlaceRepository
 from app.repositories.location import LocationRepository
 from app.repositories.sample import SampleRepository
+from app.models.user import User
+from app.models.place import Place
+from app.models.location import Location
 import logging
 
 router = APIRouter(prefix="/collect", tags=["data-collection"])
