@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.database import engine, Base
-from app.routes import collect, output
+from app.routes import collect, output, predict
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -26,6 +26,7 @@ app.add_middleware(
 # Include routers
 app.include_router(collect.router)  # Add collect router
 app.include_router(output.router)
+app.include_router(predict.router)
 
 
 @app.get("/health")
